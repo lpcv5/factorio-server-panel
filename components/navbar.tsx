@@ -14,6 +14,7 @@ export default function Navbar() {
           <ButtonGroup variant="flat" radioGroup="sm">
             {siteConfig.navItems.map((item) => (
               <Button
+                key={item.id}
                 href={item.href}
                 radius="sm"
                 as={Link}
