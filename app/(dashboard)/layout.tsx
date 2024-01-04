@@ -1,5 +1,4 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
 
 import Navbar from "@/components/navbar";
 
@@ -13,7 +12,6 @@ export default function DashboardLayout({
     <>
       <Navbar/>
       <div className="flex justify-center">{children}</div>
-
     </>
   );
 }

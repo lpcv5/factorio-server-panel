@@ -1,3 +1,4 @@
+'use client'
 import { Card, CardBody, Button, ButtonGroup } from "@nextui-org/react";
 
 import { siteConfig } from "@/config/site";

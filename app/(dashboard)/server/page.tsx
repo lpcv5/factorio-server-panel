@@ -7,7 +7,21 @@ import {
   Spacer,
 } from "@nextui-org/react";
 import React, { useState } from "react";
+import SpinnerSvg from "@/components/spinnersvg";
 import { animals } from "./data";
+
+async function getData() {
+  const res = await fetch("https://www.factorio.com/download/archive/");
+  // The return value is *not* serialized
+  // You can return Date, Map, Set, etc.
+
+  if (!res.ok) {
+    // This will activate the closest `error.js` Error Boundary
+    console.log("Failed to fetch data");
+  }
+
+  console.log(res.json());
+}
 
 export default function ServerPage() {
   const [value, setValue] = useState("");
@@ -33,7 +47,8 @@ export default function ServerPage() {
           defaultItems={animals}
           selectedKey={value}
           className=""
-          onSelectionChange={(item) => setValue(item)}
+          onClick={getData}
+          onSelectionChange={(item: any) => setValue(item)}
         >
           {(item) => (
             <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>
@@ -51,28 +66,7 @@ export default function ServerPage() {
           className="h-[120px] row-span-2"
           isLoading={startstatus}
           color="secondary"
-          spinner={
-            <svg
-              className="animate-spin h-5 w-5 text-current"
-              fill="none"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                fill="currentColor"
-              />
-            </svg>
-          }
+          spinner={<SpinnerSvg />}
           onClick={() => setStartstatus(true)}
         >
           启动中
@@ -84,7 +78,7 @@ export default function ServerPage() {
           defaultItems={animals}
           selectedKey={value}
           className="col-span-3"
-          onSelectionChange={(item) => setValue(item)}
+          onSelectionChange={(item: any) => setValue(item)}
         >
           {(item) => (
             <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>
