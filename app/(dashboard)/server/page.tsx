@@ -10,33 +10,39 @@ import React, { useState } from "react";
 import SpinnerSvg from "@/components/spinnersvg";
 import { animals } from "./data";
 
-async function getData() {
-  const res = await fetch("https://www.factorio.com/download/archive/");
-  // The return value is *not* serialized
-  // You can return Date, Map, Set, etc.
-
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    console.log("Failed to fetch data");
-  }
-
-  console.log(res.json());
+interface DownItem {
+  id: number;
+  label: string;
+  value: string
 }
 
 export default function ServerPage() {
-  const [value, setValue] = useState("");
+  const [label, setValue] = useState("");
   const [startstatus, setStartstatus] = useState(false);
+  const [downlist, setDownlist] = useState<DownItem[]>([]);
+
+  async function getData() {
+    if(downlist.length !== 0) return
+    const res = await fetch("api/server/download/");
+  
+    if (!res.ok) {
+      console.log("Failed to fetch data");
+    }
+    const data = await res.json();
+    setDownlist(data['comments']);
+    console.log(downlist);
+  }
 
   return (
     <div className="w-[800px] shadow-2xl mt-3 pt-3 rounded-xl h-max bg-slate-200">
       <div className="px-40">
-        <p>
+        <label>
           状态：<span>{startstatus ? "已启动 🟢" : "未启动 🔴"}</span>
-        </p>
+        </label>
         <Spacer y={2} />
-        <p>
-          游戏版本：<span>{value}</span>
-        </p>
+        <label>
+          游戏版本：<span>{label}</span>
+        </label>
       </div>
       <Spacer y={8} />
       <div className="flex px-40 gap-2">
@@ -44,14 +50,13 @@ export default function ServerPage() {
           label="游戏版本"
           variant="bordered"
           placeholder="请选择后下载"
-          defaultItems={animals}
-          selectedKey={value}
+          defaultItems={downlist}
           className=""
           onClick={getData}
           onSelectionChange={(item: any) => setValue(item)}
         >
           {(item) => (
-            <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>
+            <AutocompleteItem key={item.id}>{item.label}</AutocompleteItem>
           )}
         </Autocomplete>
         <Button className="h-14" color="primary">
@@ -76,7 +81,6 @@ export default function ServerPage() {
           variant="bordered"
           placeholder="选择一个存档以启动"
           defaultItems={animals}
-          selectedKey={value}
           className="col-span-3"
           onSelectionChange={(item: any) => setValue(item)}
         >
