@@ -1,27 +1,55 @@
-'use client'
-import { Button, Input, Autocomplete, AutocompleteItem } from "@nextui-org/react";
-import React from "react";
+"use client";
+import {
+  Button,
+  Input,
+  Autocomplete,
+  AutocompleteItem,
+  Spacer,
+} from "@nextui-org/react";
+import React, { useState } from "react";
 import { animals } from "./data";
+
 export default function ServerPage() {
+  const [value, setValue] = useState("");
+  const [startstatus, setStartstatus] = useState(false);
 
-  const [value, setValue] = React.useState("");
-  const [touched, setTouched] = React.useState(false);
-
-  const isValid = value === "cat";
   return (
-    <div className="flex justify-center w-full">
-      <div className="flex border min-w-[700px] shadow-2xl mt-3 pt-9 rounded-xl h-96 justify-center backdrop-blur-sm bg-white/20">
-        <Input
-          className="w-30"
-          defaultValue="0.0.0.0"
-        />
-        <Input
-          className="ml-2 w-20"
-          defaultValue="31672"
-        />
+    <div className="w-[800px] shadow-2xl mt-3 pt-3 rounded-xl h-max bg-slate-200">
+      <div className="px-40">
+        <p>
+          状态：<span>{startstatus ? "已启动 🟢" : "未启动 🔴"}</span>
+        </p>
+        <Spacer y={2} />
+        <p>
+          游戏版本：<span>{value}</span>
+        </p>
+      </div>
+      <Spacer y={8} />
+      <div className="flex px-40 gap-2">
+        <Autocomplete
+          label="游戏版本"
+          variant="bordered"
+          placeholder="请选择后下载"
+          defaultItems={animals}
+          selectedKey={value}
+          className=""
+          onSelectionChange={(item) => setValue(item)}
+        >
+          {(item) => (
+            <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>
+          )}
+        </Autocomplete>
+        <Button className="h-14" color="primary">
+          下载
+        </Button>
+      </div>
+      <Spacer y={8} />
+      <div className="grid grid-cols-4 grid-rows-2 gap-2 px-40">
+        <Input className="col-span-2" defaultValue="0.0.0.0" />
+        <Input className="col-span-1" defaultValue="31672" />
         <Button
-          className="h-14 ml-2"
-          isLoading
+          className="h-[120px] row-span-2"
+          isLoading={startstatus}
           color="secondary"
           spinner={
             <svg
@@ -45,25 +73,25 @@ export default function ServerPage() {
               />
             </svg>
           }
+          onClick={() => setStartstatus(true)}
         >
           启动中
         </Button>
         <Autocomplete
-          label="Favorite Animal"
+          label="存档"
           variant="bordered"
-          placeholder="Search an animal"
-          description="The second most popular pet in the world"
-          errorMessage={isValid || !touched ? "" : "You must select a cat"}
-          isInvalid={isValid || !touched ? false : true}
+          placeholder="选择一个存档以启动"
           defaultItems={animals}
           selectedKey={value}
-          className="max-w-xs"
-          onSelectionChange={(item) => { setValue(item); console.log(item) }}
-          onClose={() => setTouched(true)}
+          className="col-span-3"
+          onSelectionChange={(item) => setValue(item)}
         >
-          {(item) => <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>}
+          {(item) => (
+            <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>
+          )}
         </Autocomplete>
       </div>
+      <Spacer y={8} />
     </div>
   );
 }

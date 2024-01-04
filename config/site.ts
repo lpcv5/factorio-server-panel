@@ -6,7 +6,7 @@ export const siteConfig = {
   navItems: [
     {
       id: "0",
-      label: "服务器状态",
+      label: "服务器管理",
       href: "/server",
     },
     {
