@@ -16,7 +16,6 @@ export async function GET() {
       value: item.getAttribute("href")
     };
   });
-  //console.log(result[0]);
 
 
   return NextResponse.json(
