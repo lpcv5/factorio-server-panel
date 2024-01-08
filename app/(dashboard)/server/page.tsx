@@ -2,9 +2,10 @@
 import {
   Button,
   Input,
-  Autocomplete,
-  AutocompleteItem,
   Spacer,
+  Select,
+  SelectItem,
+  Selection,
 } from "@nextui-org/react";
 import React, { useState } from "react";
 import SpinnerSvg from "@/components/spinnersvg";
@@ -13,52 +14,56 @@ import { animals } from "./data";
 interface DownItem {
   id: number;
   label: string;
-  value: string
+  value: string;
 }
 
 export default function ServerPage() {
-  const [label, setValue] = useState("");
+  const [versionid, setVersionId] = useState<Selection>(new Set([]));
+  const [savesid, setSavesId] = useState<Selection>(new Set([]));
   const [startstatus, setStartstatus] = useState(false);
-  const [downlist, setDownlist] = useState<DownItem[]>([]);
+  const [downlist, setDownlist] = useState<DownItem[]>([
+    { id: 0, label: "加载中", value: "加载中" },
+  ]);
 
   async function getData() {
-    if(downlist.length !== 0) return
+    if (downlist.length !== 1) return;
     const res = await fetch("api/server/download/");
-  
+
     if (!res.ok) {
       console.log("Failed to fetch data");
     }
     const data = await res.json();
-    setDownlist(data['comments']);
-    console.log(downlist);
+    setDownlist(data["comments"]);
   }
 
   return (
-    <div className="w-[800px] shadow-2xl mt-3 pt-3 rounded-xl h-max bg-slate-200">
+    <>
       <div className="px-40">
         <label>
           状态：<span>{startstatus ? "已启动 🟢" : "未启动 🔴"}</span>
         </label>
         <Spacer y={2} />
         <label>
-          游戏版本：<span>{label}</span>
+          游戏版本：<span>{versionid}</span>
         </label>
       </div>
       <Spacer y={8} />
       <div className="flex px-40 gap-2">
-        <Autocomplete
+        <Select
           label="游戏版本"
-          variant="bordered"
           placeholder="请选择后下载"
-          defaultItems={downlist}
+          isRequired
           className=""
+          selectedKeys={versionid}
           onClick={getData}
-          onSelectionChange={(item: any) => setValue(item)}
+          onSelectionChange={setVersionId}
         >
-          {(item) => (
-            <AutocompleteItem key={item.id}>{item.label}</AutocompleteItem>
-          )}
-        </Autocomplete>
+          {downlist.map((item) => (
+            <SelectItem key={item.id} value={item.value}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </Select>
         <Button className="h-14" color="primary">
           下载
         </Button>
@@ -76,20 +81,19 @@ export default function ServerPage() {
         >
           启动中
         </Button>
-        <Autocomplete
+        <Select
           label="存档"
           variant="bordered"
           placeholder="选择一个存档以启动"
-          defaultItems={animals}
           className="col-span-3"
-          onSelectionChange={(item: any) => setValue(item)}
+          onSelectionChange={setSavesId}
         >
-          {(item) => (
-            <AutocompleteItem key={item.value}>{item.label}</AutocompleteItem>
-          )}
-        </Autocomplete>
+          {animals.map((item) => (
+            <SelectItem key={item.value}>{item.label}</SelectItem>
+          ))}
+        </Select>
       </div>
       <Spacer y={8} />
-    </div>
+    </>
   );
 }

@@ -7,11 +7,14 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  
   return (
     <>
-      <Navbar/>
-      <div className="flex justify-center">{children}</div>
+      <Navbar />
+      <div className="flex justify-center">
+        <div className="w-[800px] shadow-2xl mt-3 pt-3 rounded-xl h-max bg-slate-200">
+          {children}
+        </div>
+      </div>
     </>
   );
 }
