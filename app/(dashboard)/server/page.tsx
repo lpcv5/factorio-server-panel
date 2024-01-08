@@ -10,6 +10,7 @@ import {
 import React, { useState } from "react";
 import SpinnerSvg from "@/components/spinnersvg";
 import { animals } from "./data";
+import { trpc } from "@/app/_trpc/client";
 
 interface DownItem {
   id: number;
@@ -24,16 +25,10 @@ export default function ServerPage() {
   const [downlist, setDownlist] = useState<DownItem[]>([
     { id: 0, label: "加载中", value: "加载中" },
   ]);
-
+  const getTodos = trpc.getTodos.useQuery();
   async function getData() {
     if (downlist.length !== 1) return;
-    const res = await fetch("api/server/download/");
-
-    if (!res.ok) {
-      console.log("Failed to fetch data");
-    }
-    const data = await res.json();
-    setDownlist(data["comments"]);
+    setDownlist(getTodos.data || [{ id: 0, label: "获取失败", value: "获取失败" }]);
   }
 
   return (
