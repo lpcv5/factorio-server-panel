@@ -9,27 +9,56 @@ import {
 } from "@nextui-org/react";
 import React, { useState } from "react";
 import SpinnerSvg from "@/components/spinnersvg";
-import { animals } from "./data";
 import { trpc } from "@/app/_trpc/client";
 
-interface DownItem {
+interface Game {
   id: number;
-  label: string;
-  value: string;
+  version: string;
+  save: string;
+  gamepath: string;
 }
 
 export default function ServerPage() {
-  const [versionid, setVersionId] = useState<Selection>(new Set([]));
-  const [savesid, setSavesId] = useState<Selection>(new Set([]));
+  const [version, setVersion] = React.useState<string>("");
   const [startstatus, setStartstatus] = useState(false);
-  const [downlist, setDownlist] = useState<DownItem[]>([
-    { id: 0, label: "加载中", value: "加载中" },
-  ]);
-  const getTodos = trpc.getTodos.useQuery();
-  async function getData() {
-    if (downlist.length !== 1) return;
-    setDownlist(getTodos.data || [{ id: 0, label: "获取失败", value: "获取失败" }]);
+
+  const [game, setGame] = useState<Game>({
+    id: 0,
+    version: "",
+    save: "",
+    gamepath: "",
+  });
+
+  const dataresult = trpc.getDownlists.useQuery();
+  const setDownloadInfo = trpc.setGameConfig.useMutation();
+  const gameConfigData = trpc.getGameConfig.useQuery({ version: version });
+
+  let downlist = dataresult.data || [{ version: "加载中", downurl: "" }];
+
+  const handleVersionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (gameConfigData.data){
+      setGame(gameConfigData.data);
+    }
+
+    setVersion(e.target.value);
+  };
+
+  function setDownload() {
+    let aimIndex = downlist.findIndex((element) => element.version === version);
+    setDownloadInfo.mutate({
+      version: version,
+      url: downlist[aimIndex].downurl,
+    });
   }
+
+  //function setSaves() {
+  //  const version = Array.from(selectedversion)[0];
+  //  let aimIndex = downlist.findIndex((element) => element.version === version);
+  //  setDownloadInfo.mutate({
+  //    version: downlist[aimIndex].version,
+  //    url: downlist[aimIndex].downurl,
+  //  });
+  //}
 
   return (
     <>
@@ -39,7 +68,7 @@ export default function ServerPage() {
         </label>
         <Spacer y={2} />
         <label>
-          游戏版本：<span>{versionid}</span>
+          游戏版本：<span>{version}</span>
         </label>
       </div>
       <Spacer y={8} />
@@ -48,18 +77,18 @@ export default function ServerPage() {
           label="游戏版本"
           placeholder="请选择后下载"
           isRequired
-          className=""
-          selectedKeys={versionid}
-          onClick={getData}
-          onSelectionChange={setVersionId}
+          items={downlist}
+          selectedKeys={[version]}
+          onChange={handleVersionChange}
         >
-          {downlist.map((item) => (
-            <SelectItem key={item.id} value={item.value}>
-              {item.label}
-            </SelectItem>
-          ))}
+          {(item) => <SelectItem key={item.version}>{item.version}</SelectItem>}
         </Select>
-        <Button className="h-14" color="primary">
+        <Button
+          className="h-14"
+          color="primary"
+          onClick={setDownload}
+          isDisabled={game.id > 0}
+        >
           下载
         </Button>
       </div>
@@ -76,17 +105,17 @@ export default function ServerPage() {
         >
           启动中
         </Button>
-        <Select
+        {/*<Select
           label="存档"
           variant="bordered"
           placeholder="选择一个存档以启动"
           className="col-span-3"
-          onSelectionChange={setSavesId}
+          onSelectionChange={setSelectedSaves}
         >
           {animals.map((item) => (
             <SelectItem key={item.value}>{item.label}</SelectItem>
           ))}
-        </Select>
+        </Select>*/}
       </div>
       <Spacer y={8} />
     </>
