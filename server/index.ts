@@ -1,22 +1,9 @@
-import parse from "node-html-parser";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { publicProcedure, router } from "./trpc";
-import path from "path";
-import { mkdir } from "fs";
-import { Readable, finished } from "stream";
+import { downloadFileWget, getDownUrl, initGame } from "@/utils/utils";
 
 const prisma = new PrismaClient({});
-
-const getDownUrl = async () => {
-  const url = "https://www.factorio.com/download/archive/";
-  const response = await fetch(url);
-  const body = await response.text();
-  const root = parse(body);
-  let htmlDownlistElement = root.querySelectorAll(".slot-button-inline");
-  return htmlDownlistElement;
-};
-
 
 export const appRouter = router({
   getDownlists: publicProcedure.query(async () => {
@@ -39,19 +26,22 @@ export const appRouter = router({
     )
     .mutation(async (opts) => {
       let path = "~/factorio/" + opts.input.version.replace(/\./g, "_");
-      let url = opts.input.url;
+      let url = `https://www.factorio.com/get-download/${opts.input.version}/headless/linux64`;
+      // downloadFileWget(url, path);
+      initGame(path);
 
-      let result = {
-        version: opts.input.version,
-        save: "",
-        gamepath: path,
-      };
-      const downListCreate = await prisma.game.create({
-        data: result,
-      });
-      console.log(downListCreate);
+      // let result = {
+      //   version: opts.input.version,
+      //   save: "",
+      //   gamepath: path,
+      // };
+      // const downListCreate = await prisma.game.create({
+      //   data: result,
+      // });
+      // console.log(downListCreate);
       return {
-        downListCreate,
+        // downListCreate,
+        res: true,
       };
     }),
 
